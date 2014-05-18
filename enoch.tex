@@ -93,13 +93,20 @@
 \DeclareMathOperator{\append}{append}
 \DeclareMathOperator{\map}{map}
 
+\SaveVerb{False}|False|
 \SaveVerb{fmap f}|fmap f|
 \SaveVerb{Functor}|Functor|
 \SaveVerb{head}|head|
-
+\SaveVerb{id}|id|
 \SaveVerb{Monad}|Monad|
 \SaveVerb{Monad'}|Monad'|
 \SaveVerb{Monad''}|Monad''|
+\SaveVerb{Succ}|Succ|
+\SaveVerb{True}|True|
+\SaveVerb{Zero}|Zero|
+\SaveVerb{()}|()|
+\SaveVerb{not}|not|
+\SaveVerb{isZero}|isZero|
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,6 +123,8 @@
 \institute{EAFIT University}
 
 \date{2014}
+
+\hypersetup{pdfauthor={Juan Pedro Villa Isaza}}
 
 \begin{document}
 
@@ -726,6 +735,37 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{A Category for Haskell}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Categories}
+  \framesubtitle{A Category for Haskell}
+
+  \begin{center}
+    \begin{tikzpicture}[auto,node distance=4cm]
+      \node (bool) at (0,0)  {|Bool|};
+      \node (nat)  at (5,1)  {|Nat|};
+      \node (unit) at (3,-2) {|()|};
+
+      \draw [->] (unit) to node [swap] {\UseVerb{False}} (bool);
+      \draw [->] (unit) to node        {\UseVerb{True}}  (bool);
+
+      \draw [->] (unit) to              node [swap] {\UseVerb{Zero}} (nat);
+      \draw [->] (nat)  to [loop above] node        {\UseVerb{Succ}} (nat);
+
+      \draw [->] (unit) to [loop below] node {\UseVerb{()}} (unit);
+
+      \draw [->] (bool) to [loop left]  node {\UseVerb{id}} (bool);
+      \draw [->] (nat)  to [loop right] node {\UseVerb{id}} (nat);
+      \draw [->] (unit) to [loop right] node {\UseVerb{id}} (unit);
+
+      \draw [->] (bool) to [loop above] node        {\UseVerb{not}}    (bool);
+      \draw [->] (nat)  to              node [swap] {\UseVerb{isZero}} (bool);
+    \end{tikzpicture}
+  \end{center}
+
+\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
