@@ -93,11 +93,16 @@
 \DeclareMathOperator{\append}{append}
 \DeclareMathOperator{\map}{map}
 
+\SaveVerb{concat}|concat|
 \SaveVerb{False}|False|
+\SaveVerb{f}|f|
+\SaveVerb{g}|g|
+\SaveVerb{fmap}|fmap|
 \SaveVerb{fmap f}|fmap f|
 \SaveVerb{Functor}|Functor|
 \SaveVerb{head}|head|
 \SaveVerb{id}|id|
+\SaveVerb{last}|last|
 \SaveVerb{Monad}|Monad|
 \SaveVerb{Monad'}|Monad'|
 \SaveVerb{Monad''}|Monad''|
@@ -107,6 +112,10 @@
 \SaveVerb{()}|()|
 \SaveVerb{not}|not|
 \SaveVerb{isZero}|isZero|
+\SaveVerb{tau}|tau|
+\SaveVerb{(fmap}|(fmap|
+\SaveVerb{f)}|f)|
+\SaveVerb{=}|=|
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -585,7 +594,7 @@
         \item \alert{Chapter 2 (Categories)}
         \item Chapter 3 (Constructions)
         \item \alert{Chapter 4 (Functors)}
-        \item Chapter 5 (Natural Transformations)
+        \item \alert{Chapter 5 (Natural Transformations)}
         \item Chapter 6 (Monads and Kleisli Triples)
         \item Chapter 7 (Algebras and Initial Algebras)
         \end{itemize}
@@ -597,7 +606,7 @@
           \node (2)                    {\alert{2}};
           \node (3) [below of=2]       {3};
           \node (4) [below of=3]       {\alert{4}};
-          \node (5) [below left of=4]  {5};
+          \node (5) [below left of=4]  {\alert{5}};
           \node (6) [below of=5]       {6};
           \node (7) [below right of=4] {7};
           \node (c) [right of=3]       {};
@@ -705,29 +714,6 @@
       \draw [->] (a2) to node        {$f$}       (b2);
     \end{tikzpicture}
   \end{center}
-
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[label={ex:set}]
-  \frametitle{Categories}
-
-  \begin{example}
-    \set is the category of sets and functions.
-    \begin{itemize}
-    \item
-      Objects: Sets $A$, $B$, $C$, ...
-    \item
-      Morphisms: Functions $f: A \to B$, $g: B \to C$, ...
-    \item
-      Identities: $\idO{A}: A \to A$ such that $\idO{A}(x) = x$, ...
-    \item
-      Composites: $g \comp f: A \to C$ such that $(g \comp f)(x) =
-      g(f(x))$, ...
-    \end{itemize}
-  \end{example}
-  \vfill\hfill\hyperlink{re:foundations}{\beamergotobutton{}}
 
 \end{frame}
 
@@ -968,21 +954,169 @@ instance Functor [] where
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Natural Transformations}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Natural Transformations}
+
+  \begin{quote}
+    ... and \emph{functor} has been defined in order to be able to
+    define \emph{natural transformation}.
+  \end{quote}
+  \hfill ---Saunders Mac Lane
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[label={def:natural}]
+  \frametitle{Natural Transformations}
+
+  \begin{definition}[Natural transformation]
+    \begin{itemize}
+    \item
+      Let \cat{C} and \cat{D} be categories.
+    \item
+      Let \func{F} and $\func{G}: \cat{C} \to \cat{D}$ be functors.
+    \item
+      A natural transformation $\nat{\tau}: \func{F} \to \func{G}:
+      \cat{C} \to \cat{D}$ assigns:
+      \begin{itemize}
+      \item
+        To each object $a$ in \cat{C},\\ a morphism $\natO{\tau}{a}:
+        \funcO{F}(a) \to \funcO{F}(b)$ in \cat{D}.
+      \end{itemize}
+    \item
+      Such that:
+      \begin{itemize}
+      \item
+        Naturality: $\natO{\tau}{b} \comp \funcM{F}(f) = \funcM{G}(f)
+        \comp \natO{\tau}{a}$
+      \end{itemize}
+    \end{itemize}
+  \end{definition}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Natural Transformations}
+
+  \begin{definition}[Natural transformation]
+    \begin{itemize}
+    \item
+      Naturality: $\natO{\tau}{b} \comp \funcM{F}(f) = \funcM{G}(f)
+      \comp \natO{\tau}{a}$
+    \end{itemize}
+  \end{definition}
+  \begin{center}
+    \begin{tikzpicture}[auto,node distance=3cm]
+      \node (f a)                {$\funcO{F}(a)$};
+      \node (f b) [below of=f a] {$\funcO{F}(b)$};
+      \node (g a) [right of=f a] {$\funcO{G}(a)$};
+      \node (g b) [below of=g a] {$\funcO{G}(b)$};
+
+      \draw [->] (f a) to node [swap] {$\funcM{F}(f)$} (f b);
+      \draw [->] (g a) to node        {$\funcM{G}(f)$} (g b);
+
+      \draw [->] (f a) to node        {$\natO{\tau}{a}$} (g a);
+      \draw [->] (f b) to node [swap] {$\natO{\tau}{b}$} (g b);
+    \end{tikzpicture}
+  \end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Natural Transformations in Haskell}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Natural Transformations}
+  \framesubtitle{Natural Transformations in Haskell}
+
+  A parametrically polymorphic function is a natural transformation.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[fragile]
-  \frametitle{Functors}
-  \framesubtitle{Functors in Haskell}
+  \frametitle{Natural Transformations}
+  \framesubtitle{Natural Transformations in Haskell}
 
-  \begin{alertblock}{Example?}
-    \begin{code}
-data [] a = [] | a : [a]
+  \begin{center}
+    \begin{tikzpicture}[auto,node distance=3cm]
+      \node (f a)                {|f| |a|};
+      \node (f b) [below of=f a] {|f| |b|};
+      \node (g a) [right of=f a] {|g| |a|};
+      \node (g b) [below of=g a] {|g| |b|};
 
-instance Functor [] where
-  fmap :: (a -> b) -> [a] -> [b]
-  fmap _ []     = []
-  fmap f (x:xs) = f x : f x : fmap f xs
-    \end{code}
-  \end{alertblock}
+      \draw [->] (f a) to node [swap] {\UseVerb{fmap} \UseVerb{f}} (f b);
+      \draw [->] (g a) to node        {\UseVerb{fmap} \UseVerb{f}} (g b);
+
+      \draw [->] (f a) to node        {\UseVerb{tau}} (g a);
+      \draw [->] (f b) to node [swap] {\UseVerb{tau}} (g b);
+    \end{tikzpicture}
+  \end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Natural Transformations}
+  \framesubtitle{Natural Transformations in Haskell}
+
+  \begin{example}
+    \begin{center}
+      \begin{tikzpicture}[auto,node distance=3cm]
+        \node (f a)                {|[a]|};
+        \node (f b) [below of=f a] {|[b]|};
+        \node (g a) [right of=f a] {|Maybe| |a|};
+        \node (g b) [below of=g a] {|Maybe| |b|};
+
+        \draw [->] (f a) to node [swap] {\UseVerb{fmap} \UseVerb{f}} (f b);
+        \draw [->] (g a) to node        {\UseVerb{fmap} \UseVerb{f}} (g b);
+
+        \draw [->] (f a) to node        {\UseVerb{head}} (g a);
+        \draw [->] (f b) to node [swap] {\UseVerb{head}} (g b);
+      \end{tikzpicture}
+    \end{center}
+  \end{example}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Natural Transformations}
+  \framesubtitle{Natural Transformations in Haskell}
+
+  \begin{example}
+    \begin{center}
+      \begin{tikzpicture}[auto,node distance=3cm]
+        \node (f a)                {|[[a]]|};
+        \node (f b) [below of=f a] {|[[b]]|};
+        \node (g a) [right of=f a] {|[a]|};
+        \node (g b) [below of=g a] {|[b]|};
+
+        \draw [->] (f a) to node [swap] {\UseVerb{fmap} \UseVerb{(fmap} \UseVerb{f)}} (f b);
+        \draw [->] (g a) to node        {\UseVerb{fmap} \UseVerb{f}}                  (g b);
+
+        \draw [->] (f a) to node        {\UseVerb{concat}} (g a);
+        \draw [->] (f b) to node [swap] {\UseVerb{concat}} (g b);
+      \end{tikzpicture}
+    \end{center}
+  \end{example}
 
 \end{frame}
 
@@ -1100,6 +1234,8 @@ instance Functor [] where
     \begin{itemize}
     \item
       The |Category| type class.
+    \item
+      The |Arrow| type class.
     \end{itemize}
   \end{itemize}
   \begin{itemize}
@@ -1237,6 +1373,28 @@ instance Functor [] where
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\begin{frame}[label={ex:set}]
+  \frametitle{Categories}
+
+  \begin{example}
+    \set is the category of sets and functions.
+    \begin{itemize}
+    \item
+      Objects: Sets $A$, $B$, $C$, ...
+    \item
+      Morphisms: Functions $f: A \to B$, $g: B \to C$, ...
+    \item
+      Identities: $\idO{A}: A \to A$ such that $\idO{A}(x) = x$, ...
+    \item
+      Composites: $g \comp f: A \to C$ such that $(g \comp f)(x) =
+      g(f(x))$, ...
+    \end{itemize}
+  \end{example}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}[label={re:foundations}]
   \frametitle{Categories}
   \framesubtitle{Foundations}
@@ -1260,7 +1418,6 @@ instance Functor [] where
       Objects of \set: The sets which are members of the universe.
     \end{itemize}
   \end{itemize}
-  \vfill\hfill\hyperlink{ex:set}{\beamerreturnbutton{Return}}
 
 \end{frame}
 
@@ -1298,96 +1455,31 @@ undefined = undefined
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Natural Transformations}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-  \frametitle{Natural Transformations}
-
-  \begin{quote}
-    ... and \emph{functor} has been defined in order to be able to
-    define \emph{natural transformation}.
-  \end{quote}
-  \hfill ---Saunders Mac Lane
-
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}[label={def:natural}]
-  \frametitle{Natural Transformations}
-
-  \begin{definition}[Natural transformation]
-    \begin{itemize}
-    \item
-      Let \cat{C} and \cat{D} be categories.
-    \item
-      Let \func{F} and $\func{G}: \cat{C} \to \cat{D}$ be functors.
-    \item
-      A natural transformation $\nat{\tau}: \func{F} \to \func{G}:
-      \cat{C} \to \cat{D}$ assigns:
-      \begin{itemize}
-      \item
-        To each object $a$ in \cat{C},\\ a morphism $\natO{\tau}{a}:
-        \funcO{F}(a) \to \funcO{F}(b)$ in \cat{D}.
-      \end{itemize}
-    \item
-      Such that:
-      \begin{itemize}
-      \item
-        Naturality: $\natO{\tau}{b} \comp \funcM{F}(f) = \funcM{G}(f)
-        \comp \natO{\tau}{a}$
-      \end{itemize}
-    \end{itemize}
-  \end{definition}
-
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-  \frametitle{Natural Transformations}
-
-  \begin{definition}[Natural transformation]
-    \begin{itemize}
-    \item
-      Naturality: $\natO{\tau}{b} \comp \funcM{F}(f) = \funcM{G}(f)
-      \comp \natO{\tau}{a}$
-    \end{itemize}
-  \end{definition}
-  \begin{center}
-    \begin{tikzpicture}[auto,node distance=3cm]
-      \node (f a)                {$\funcO{F}(a)$};
-      \node (f b) [below of=f a] {$\funcO{F}(b)$};
-      \node (g a) [right of=f a] {$\funcO{G}(a)$};
-      \node (g b) [below of=g a] {$\funcO{G}(b)$};
-
-      \draw [->] (f a) to node [swap] {$\funcM{F}(f)$}   (f b);
-      \draw [->] (g a) to node        {$\funcM{G}(f)$}   (g b);
-
-      \draw [->] (f a) to node        {$\natO{\tau}{a}$} (g a);
-      \draw [->] (f b) to node [swap] {$\natO{\tau}{b}$} (g b);
-    \end{tikzpicture}
-  \end{center}
-
-\end{frame}
+\subsection{Functors}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}[fragile]
-  \frametitle{Natural Transformations}
-  \framesubtitle{Natural Transformations in Haskell}
+  \frametitle{Functors}
+  \framesubtitle{Functors in Haskell}
 
-  \begin{example}
+  \begin{alertblock}{Example?}
     \begin{code}
-head :: [a] -> Maybe a
-head []    = Nothing
-head (x:_) = x
+data [] a = [] | a : [a]
+
+instance Functor [] where
+  fmap :: (a -> b) -> [a] -> [b]
+  fmap _ []     = []
+  fmap f (x:xs) = f x : f x : fmap f xs
     \end{code}
-  \end{example}
+  \end{alertblock}
 
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Natural Transformations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1400,14 +1492,14 @@ head (x:_) = x
       \begin{tikzpicture}[auto,node distance=3cm]
         \node (f a)                {|[a]|};
         \node (f b) [below of=f a] {|[b]|};
-        \node (g a) [right of=f a] {|Maybe a|};
-        \node (g b) [below of=g a] {|Maybe b|};
+        \node (g a) [right of=f a] {|Maybe| |a|};
+        \node (g b) [below of=g a] {|Maybe| |b|};
 
-        \draw [->] (f a) to node [swap] {\UseVerb{fmap f}}   (f b);
-        \draw [->] (g a) to node        {\UseVerb{fmap f}}   (g b);
+        \draw [->] (f a) to node [swap] {\UseVerb{fmap} \UseVerb{f}} (f b);
+        \draw [->] (g a) to node        {\UseVerb{fmap} \UseVerb{f}} (g b);
 
-        \draw [->] (f a) to node        {\UseVerb{head}} (g a);
-        \draw [->] (f b) to node [swap] {\UseVerb{head}} (g b);
+        \draw [->] (f a) to node        {\UseVerb{last}} (g a);
+        \draw [->] (f b) to node [swap] {\UseVerb{last}} (g b);
       \end{tikzpicture}
     \end{center}
   \end{example}
@@ -1582,6 +1674,21 @@ class Monad'' m where
   \frametitle{Kleisli Triples}
   \framesubtitle{Kleisli Triples in Haskell}
 
+  \begin{block}{\UseVerb{Monad} \UseVerb{=} \UseVerb{Monad''}}
+    \begin{code}
+(>>=) :: Monad'' m => m a -> (a -> m b) -> m b
+mx >>= f = bind f mx
+    \end{code}
+  \end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Kleisli Triples}
+  \framesubtitle{Kleisli Triples in Haskell}
+
   \begin{example}
     \begin{code}
 instance Monad'' Maybe where
@@ -1593,6 +1700,39 @@ instance Monad'' Maybe where
   bind f (Just x) = f x
     \end{code}
   \end{example}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Monads and Kleisli Triples}
+  \framesubtitle{Monads and Kleisli Triples in Haskell}
+
+  \begin{block}{\UseVerb{Monad'} \UseVerb{=} \UseVerb{Monad''}}
+    \begin{code}
+bind :: Monad' m => (a -> m b) -> m a -> m b
+bind f mx = join (fmap f mx)
+    \end{code}
+  \end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]
+  \frametitle{Monads and Kleisli Triples}
+  \framesubtitle{Monads and Kleisli Triples in Haskell}
+
+  \begin{block}{\UseVerb{Monad'} \UseVerb{=} \UseVerb{Monad''}}
+    \begin{code}
+fmap :: Monad'' m => (a -> b) -> m a -> m b
+fmap f mx = bind (return . f) mx
+
+join :: Monad'' m => m (m a) -> m a
+join mmx = bind id mmx
+    \end{code}
+  \end{block}
 
 \end{frame}
 
