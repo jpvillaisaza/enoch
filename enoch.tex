@@ -192,7 +192,11 @@
     \item
       Functors
     \item
+      Parametrically polymorphic functions
+    \item
       Monads
+    \item
+      Algebraic data types
     \item
       ...
     \end{itemize}
@@ -231,8 +235,18 @@
       \begin{itemize}
       \item
         Haskell
+        \begin{itemize}
+        \item
+          Functional programming language
+        \end{itemize}
       \item
         Agda
+        \begin{itemize}
+        \item
+          Dependently typed functional programming language
+        \item
+          Proof assistant
+        \end{itemize}
       \end{itemize}
     \end{itemize}
   \end{block}
@@ -396,7 +410,7 @@
     \begin{column}{\textwidth}
       \begin{block}{Aim and objectives}
         \begin{itemize}
-        \item Auxiliary
+        \item All
         \end{itemize}
       \end{block}
     \end{column}
@@ -643,10 +657,13 @@
     \item
       Morphisms $f: a \to b$, $g: b \to c$, ...
     \item
-      Identity morphisms $\idO{a}: a \to a$, $\idO{b}: b \to b$,
-      $\idO{c}: c \to c$, ...
+      Domain and codomain objects $a = \dom(f)$ and $b = \cod(f)$ for
+      $f: a \to b$, ...
     \item
-      Composite morphisms $g \comp f: a \to c$, ...
+      Identity morphisms $\idO{a}: a \to a$, ...
+    \item
+      Composite morphisms $g \comp f: a \to c$ for $f: a \to b$ and
+      $g: b \to c$, ...
     \end{itemize}
     Such that:
     \begin{itemize}
@@ -776,7 +793,6 @@ not True  = False
       \end{code}
     \end{itemize}
   \end{example}
-  \vfill\hfill\hyperlink{re:hask}{\beamergotobutton{}}
 
 \end{frame}
 
@@ -803,6 +819,27 @@ id x = x
       \end{code}
     \end{itemize}
   \end{example}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[label={bottom}]
+  \frametitle{Categories}
+  \framesubtitle{A Category for Haskell}
+
+  \begin{block}{Bottom}
+    \begin{itemize}
+    \item
+      Haskell types have bottom and do not yield a category.
+    \end{itemize}
+    \begin{itemize}
+    \item
+      By Haskell types, we actually mean Haskell types without bottom,
+      which yield a category: \hask.
+    \end{itemize}
+    \vfill\hfill\hyperlink{re:hask}{\beamergotobutton{Bottom}}
+  \end{block}
 
 \end{frame}
 
@@ -853,6 +890,43 @@ id x = x
         $\funcM{F}(g \comp f) = \funcM{F}(g) \comp \funcM{F}(f)$
       \end{itemize}
     \end{itemize}
+  \end{definition}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+  \frametitle{Functors}
+
+  \begin{definition}[Functor]
+    \begin{center}
+      \begin{tikzpicture}[auto,node distance=2.75cm]
+        \node (a)              {$a$};
+        \node (b) [right of=a] {$b$};
+        \node (c) [below of=b] {$c$};
+
+        \draw [->] (a) to node        {$f$}         (b);
+        \draw [->] (b) to node        {$g$}         (c);
+        \draw [->] (a) to node [swap] {$g \comp f$} (c);
+
+        \draw [->] (a) to [loop above] node {$\idO{a}$} (a);
+        \draw [->] (b) to [loop above] node {$\idO{b}$} (b);
+        \draw [->] (c) to [loop below] node {$\idO{c}$} (c);
+
+        \node (f a) [right of=b]   {$\funcO{F}(a)$};
+        \node (f b) [right of=f a] {$\funcO{F}(b)$};
+        \node (f c) [below of=f b] {$\funcO{F}(c)$};
+
+        \draw [->] (f a) to node        {$\funcM{F}(f)$}         (f b);
+        \draw [->] (f b) to node        {$\funcM{F}(g)$}         (f c);
+        \draw [->] (f a) to node [swap] {$\funcM{F}(g \comp f)$} (f c);
+
+        \draw [->] (f a) to [loop above] node {$\idO{\funcO{F}(a)}$} (f a);
+        \draw [->] (f b) to [loop above] node {$\idO{\funcO{F}(b)}$} (f b);
+        \draw [->] (f c) to [loop below] node {$\idO{\funcO{F}(c)}$} (f c);
+      \end{tikzpicture}
+    \end{center}
   \end{definition}
 
 \end{frame}
@@ -1427,28 +1501,30 @@ instance Functor [] where
   \frametitle{Categories}
   \framesubtitle{A Category for Haskell}
 
-  \begin{itemize}
-  \item
-    Haskell types have bottom:
-    \begin{code}
+  \begin{block}{Bottom}
+    \begin{itemize}
+    \item
+      Haskell types have bottom:
+      \begin{code}
 undefined :: a
 undefined = undefined
-    \end{code}
-  \item
-    Haskell types do not yield a category.
-  \end{itemize}
-  \begin{itemize}
-  \item
-    By Haskell types, we actually mean Haskell types without bottom,
-    which yield a category: \hask.
-  \end{itemize}
-  \begin{thebibliography}{}
-  \setbeamertemplate{bibliography entry title}{}
-  \setbeamertemplate{bibliography item}[online]
-  \bibitem[]{}
-    \newblock See \url{http://www.haskell.org/haskellwiki/Hask}.
-  \end{thebibliography}
-  \vfill\hfill\hyperlink{ex:hask}{\beamerreturnbutton{Return}}
+      \end{code}
+    \item
+      Haskell types do not yield a category.
+    \end{itemize}
+    \begin{itemize}
+    \item
+      By Haskell types, we actually mean Haskell types without bottom,
+      which yield a category: \hask.
+    \end{itemize}
+    \begin{thebibliography}{}
+    \setbeamertemplate{bibliography entry title}{}
+    \setbeamertemplate{bibliography item}[online]
+    \bibitem[]{}
+      \newblock See \url{http://www.haskell.org/haskellwiki/Hask}.
+    \end{thebibliography}
+    \vfill\hfill\hyperlink{bottom}{\beamerreturnbutton{Return}}
+  \end{block}
 
 \end{frame}
 
